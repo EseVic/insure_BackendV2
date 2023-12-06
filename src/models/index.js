@@ -46,6 +46,9 @@ db.premiumTransaction = require('./premiumTransaction.model')(sequelizeInstance,
 db.users.hasOne(db.agent)
 db.agent.belongsTo(db.users);
 
+db.users.hasOne(db.company)
+db.company.belongsTo(db.users);
+
 db.company.hasMany(db.agent);
 db.agent.belongsTo(db.company);
 

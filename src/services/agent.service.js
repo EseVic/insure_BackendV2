@@ -2,7 +2,7 @@ const { db } = require('../models');
 
 const createAgent = async (userId, agentBody) => {
   return await db.agent.create({
-    userId,
+    compannyId,
     ...agentBody,
   });
 };

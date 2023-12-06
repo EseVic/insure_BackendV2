@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
+require("dotenv").config();
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -11,6 +12,15 @@ if (config.env !== 'test') {
     .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
 }
 
+var transporter = nodemailer.createTransport('SMTP', {
+  host: 'smtp.ethereal.email',
+  port: 587,
+  auth: {
+      user: 'deron83@ethereal.email',
+      pass: 'SdYFwu5UEPY8qvm5zF'
+  }
+});
+
 /**
  * Send an email
  * @param {string} to
@@ -19,8 +29,8 @@ if (config.env !== 'test') {
  * @returns {Promise}
  */
 const sendEmail = async (to, subject, text) => {
-  const msg = { from: config.email.from, to, subject, text };
-  await transport.sendMail(msg);
+  const msg = { from: process.env.EMAIL_FROM, to, subject, text };
+  await transporter.sendMail(msg);
 };
 
 /**
