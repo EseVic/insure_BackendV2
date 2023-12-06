@@ -39,6 +39,10 @@ module.exports = (sequelize, dataType) => {
       allowNull: false,
       trim: true,
     },
+    verifyToken:  {
+      type: dataType.STRING,
+     
+    }
   });
 
   user.associate = (models) => {
