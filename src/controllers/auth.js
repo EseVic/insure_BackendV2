@@ -6,18 +6,20 @@ const { emailService } = require('../services');
 
 const axios = require("axios");
 const generator = require("generate-password");
+const { email } = require("../config/config");
 
 
 
 exports.authController = {
     reg: async (req, res) => {
         const type = req.query.type;
-    
+        console.log(type)
         let verifyToken = "";
         let emaildata = {};
         switch (type) {
           case "company":
             const user = req.body;
+            console.log(user)
             if (!req.body || !req.body.email) {
               res.status(400).send({
                 status: false,
@@ -31,6 +33,8 @@ exports.authController = {
                 },
               })
               .then(async (data) => {
+                console.log(user.email)
+                console.log(data)
                 if (data && data.isEmailVerified) {
                   res.status(404).send({
                     status: false,
@@ -42,15 +46,16 @@ exports.authController = {
                     length: 5,
                     numbers: true,
                   });
-                  await emailService.sendEmail({
-                    to: [data.email.toString()],
-                    subject: "Verify your account",
-                    text: `Dear user,
+                  console.log(data.email)
+                  await emailService.sendEmail(
+                     [data.email.toString()],
+                     "Verify your account",
+                     `Dear user,
                     @ Thanks for signing up to INsure!
                     Your verification pin is: ${verifyToken} `,
 
                     
-                  });
+                  );
     
                  
     
@@ -77,15 +82,15 @@ exports.authController = {
                     await db.company.create({...user, userId: data1.id})
                     //   emaildata.user = data1.firstName + " " + data1.lastName;
                       emaildata.verifyToken = data1.verifyToken;
-                      await emailService.sendEmail({
-                        to: [data.email.toString()],
-                        subject: "Verify your account",
-                        text: `Dear user,
-                        @ ${req.body.companyName} has requested to you to be an agent 
-                        to accept the request and make sure you use your registered email Thanks for signing up to Planvest!
-                        Your verification pin is: ${verifyToken} `,
+                      await emailService.sendEmail(
+                         data1.email.toString(),
+                        // subject: "Verify your account",
+                        // text: `Dear user,
+                        // @ ${req.body.companyName} has requested to you to be an agent 
+                        // to accept the request and make sure you use your registered email Thanks for signing up to Planvest!
+                        // Your verification pin is: ${verifyToken} `,
     
-                      })    
+                      )    
                       delete data1.password;
                       delete data1.verifyToken;
                       const respayload = {

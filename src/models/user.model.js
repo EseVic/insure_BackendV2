@@ -13,11 +13,11 @@ module.exports = (sequelize, dataType) => {
       unique: true,
       trim: true,
       lowercase: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error('Invalid email');
-        }
-      },
+      // validate(value) {
+      //   if (!validator.isEmail(value)) {
+      //     throw new Error('Invalid email');
+      //   }
+      // },
     },
     password: {
       type: dataType.STRING,
@@ -32,6 +32,7 @@ module.exports = (sequelize, dataType) => {
     },
     isEmailVerified: {
       type: dataType.BOOLEAN,
+      default: false
     },
     role: {
       type: dataType.ENUM('company', 'agent', 'superAdmin'),

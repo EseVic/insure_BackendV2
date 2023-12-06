@@ -69,7 +69,7 @@ app.use(errorHandler);
 app.use('/middleware', agent)
 
 // intit DB
-db.sequelize.sync({ force: true }).catch((err) => {
+db.sequelize.sync().catch((err) => {
   console.log(err);
 });
 

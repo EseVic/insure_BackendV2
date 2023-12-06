@@ -12,12 +12,12 @@ if (config.env !== 'test') {
     .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
 }
 
-var transporter = nodemailer.createTransport('SMTP', {
+const transporter = nodemailer.createTransport({
   host: 'smtp.ethereal.email',
   port: 587,
   auth: {
-      user: 'deron83@ethereal.email',
-      pass: 'SdYFwu5UEPY8qvm5zF'
+      user: 'myrna.gleason53@ethereal.email',
+      pass: 'RvbnKGKwZuU152B9G2'
   }
 });
 
@@ -28,8 +28,9 @@ var transporter = nodemailer.createTransport('SMTP', {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
-  const msg = { from: process.env.EMAIL_FROM, to, subject, text };
+const sendEmail = async (to) => {
+  const msg = { from: process.env.EMAIL_FROM, to, subject:"anything", text:"something" };
+  console.log(msg)
   await transporter.sendMail(msg);
 };
 

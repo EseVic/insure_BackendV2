@@ -15,7 +15,7 @@ const defaultRoutes = [
   {
     path: '/users',
     route: userRoute,
-  },
+  }
 
   // {
   //   path: '/agent',
