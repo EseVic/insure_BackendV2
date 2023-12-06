@@ -81,7 +81,7 @@ exports.authController = {
                   await db.company.create({ ...user, userId: data1.id })
                   await emailService.sendEmail(
                     {
-                      to: [data.email.toString()],
+                      to: data1.email.toString(),
                       subject: "Verify your account",
                       text: `Dear user,
                           @ Thanks for signing up to INsure!
@@ -138,13 +138,13 @@ exports.authController = {
             },
           })
           .then(async (data) => {
-            if (data && data.isVerified) {
+            if (data && data.isEmailVerified) {
               res.status(400).send({
                 status: false,
                 message: "This Email is taken",
               });
-            } else if (data && !data.isVerified) {
-              const companyData = await db.company.findOne({ where: { id: agentData.companyId } })
+            } else if (data && !data.isEmailVerified) {
+              const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } })
               verifyToken = generator.generate({
                 length: 5,
                 numbers: true,
@@ -184,11 +184,10 @@ exports.authController = {
               db.users
                 .create(agentData)
                 .then(async (data1) => {
+                  console.log(data1)
                   await db.agent.create({ ...agentData, userId: data1.id })
-                  emaildata.user = data1.cooperativeName;
-                  emaildata.verifyToken = data1.verifyToken;
                   await emailService.sendEmail({
-                    to: [data.email.toString()],
+                    to: [data1.email.toString()],
                     subject: "Verify your account",
                     text: `Dear user,
                         @ ${companyData.companyName} just invited you to INsure! Please visit this website to setup your account
@@ -290,7 +289,7 @@ exports.authController = {
               .send({ status: false, message: "Verify account error" });
           } else {
             const updatedUser = await db.agent.update(
-              { isVerified: true },
+              { isEmailVerified: true },
               {
                 where: {
                   id: agentData.id,
@@ -331,7 +330,7 @@ exports.authController = {
         try {
           const user = await db.users.findOne({
             where: { email: req.body.email },
-            include: [{ model: db.company, as: "company" }],
+            include: [{ model: db.company, as: "companyProfile" }],
           });
           // if record doesn't exist
           if (!user) {
@@ -341,7 +340,7 @@ exports.authController = {
             });
           }
 
-          if (!user.isVerified) {
+          if (!user.isEmailVerified) {
             return res.status(404).send({
               status: false,
               message: "verify account first",
@@ -369,9 +368,6 @@ exports.authController = {
             userId: user.id,
             userType: user.userType,
           };
-          let token = sign(payload, process.env.JWT, {
-            expiresIn: 36000,
-          });
 
           
           res.status(200).send({
@@ -400,7 +396,7 @@ exports.authController = {
                 message: "Invalid username or password",
               });
             }
-            if (!agentData.isVerified) {
+            if (!agentData.isEmailVerified) {
               return res.status(404).send({
                 status: false,
                 message: " verify account first",
@@ -426,11 +422,8 @@ exports.authController = {
             };
             delete agentData.password;
             delete agentData.verifyToken;
-            let token = sign(payload, process.env.JWT, {
-              expiresIn: 36000,
-            });
+          
 
-            
 
             res.status(200).send({
               status: true,

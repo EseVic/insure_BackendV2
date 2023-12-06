@@ -38,7 +38,6 @@ db.portfolio = require('./portfolio.model')(sequelizeInstance, Sequelize);
 db.policy = require('./policy.model')(sequelizeInstance, Sequelize);
 db.nextOfKin = require('./nextOfKin.model')(sequelizeInstance, Sequelize);
 db.superAdmin = require('./superAdmin.model')(sequelizeInstance, Sequelize);
-db.user_agents = require('./user_agents.model')(sequelizeInstance, Sequelize);
 db.premiumTransaction = require('./premiumTransaction.model')(sequelizeInstance, Sequelize);
 
 // relationships for models

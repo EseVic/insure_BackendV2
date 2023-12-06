@@ -32,7 +32,7 @@ module.exports = (sequelize, dataType) => {
     },
     isEmailVerified: {
       type: dataType.BOOLEAN,
-      default: false
+      defaultValue: false
     },
     role: {
       type: dataType.ENUM('company', 'agent', 'superAdmin'),
