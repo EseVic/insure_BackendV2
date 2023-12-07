@@ -50,9 +50,9 @@ exports.authController = {
               await emailService.sendEmail({
                 to: [data.email.toString()],
                 subject: "Verify your account",
-                text: `Dear ${user.companyName},
-                    @ Thanks for signing up to INsure!
-                    Your verification pin is: ${verifyToken} `,
+                text: `Dear user, 
+                             @ Thanks for signing up to INsure!
+                       Your verification pin is: ${verifyToken} `,
 
               }
 
@@ -83,9 +83,9 @@ exports.authController = {
                     {
                       to: data1.email.toString(),
                       subject: "Verify your account",
-                      text: `Dear ${user.companyName},
-                      Thanks for signing up to INsure!
-                      Your verification pin is: ${verifyToken}`,
+                      text: `Dear user, 
+                                    @ Thanks for signing up to INsure!
+                              Your verification pin is: ${verifyToken} `,
 
 
                     }
@@ -156,11 +156,13 @@ exports.authController = {
               });
               await emailService.sendEmail({
                 to: [data.email.toString()],
-                subject: "Verify your email",
-                text: `Dear ${agentData.firstName},
-                Thanks for signing up to INsure!
-                Your verification pin is: ${verifyToken} `,
-                
+                subject: "Verify your account",
+                text: `Dear user,
+                        @ ${companyData.companyName} just invited you to INsure! 
+                        Please click on this link () to setup your accoun.
+                         `,
+
+
               });
               delete data.password;
               delete data.verifyToken;
@@ -214,8 +216,10 @@ exports.authController = {
                   await emailService.sendEmail({
                     to: [data1.email.toString()],
                     subject: "Verify your account",
-                    text: `Dear ${agentData.firstName},
-                    ${companyData.companyName} just invited you to INsure! Please visit this website ${process.env.agent_url} to setup your account. This is your verification pin ${verifyToken}`,
+                    text: `Dear user,
+                        @ ${companyData.companyName} just invited you to INsure! 
+                        Please click on this link (https://insure-personal-git-alice-home-alice2212.vercel.app/auth/admin/registration/setup) to setup your account
+                         `,
 
 
                   });
