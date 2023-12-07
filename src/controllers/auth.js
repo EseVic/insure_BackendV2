@@ -51,8 +51,8 @@ exports.authController = {
                 to: [data.email.toString()],
                 subject: "Verify your account",
                 text: `Dear user, 
-                             @ Thanks for signing up to INsure!
-                       Your verification pin is: ${verifyToken} `,
+                      Thanks for signing up to INsure!
+                      Your verification pin is: ${verifyToken}`,
 
               }
 
@@ -84,8 +84,8 @@ exports.authController = {
                       to: data1.email.toString(),
                       subject: "Verify your account",
                       text: `Dear user, 
-                                    @ Thanks for signing up to INsure!
-                              Your verification pin is: ${verifyToken} `,
+                            Thanks for signing up to INsure!
+                            Your verification pin is: ${verifyToken} `,
 
 
                     }
@@ -143,7 +143,7 @@ exports.authController = {
                 email: agentData.email,
               },
             })
-            if (data && data.isEmailVerified && agentInfo) {
+            if (data && data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
               res.status(400).send({
                 status: false,
                 message: "This Email is taken",
@@ -158,9 +158,7 @@ exports.authController = {
                 to: [data.email.toString()],
                 subject: "Verify your account",
                 text: `Dear user,
-                        @ ${companyData.companyName} just invited you to INsure! 
-                        Please click on this link () to setup your accoun.
-                         `,
+                      Your verification pin is ${verifyToken}`,
 
 
               });
@@ -173,16 +171,21 @@ exports.authController = {
                 data,
               });
             } else if (data && !data.isEmailVerified && !agentInfo.firstName && !agentInfo.lastName && agentData.firstName && agentData.lastName) {
-              await db.agent.create({ ...agentData, userId: data.id })
+              await db.agent.update({ ...agentData, userId: data.id }, {
+                where: {
+                  id: agentInfo.id,
+                },
+              } )
               verifyToken = generator.generate({
                 length: 5,
                 numbers: true,
               });
               await emailService.sendEmail({
                 to: [data.email.toString()],
-                subject: "Signup as an agent on INsure",
-                text: `Dear ${agentData.firstName},
-                ${companyData.companyName} just invited you to INsure! Please visit this website ${process.env.agent_url} to setup your account. Your verification pin is ${verifyToken}`,
+                subject: "Verify your account",
+                text: `Dear user,
+                      Your verification pin is ${verifyToken}`,
+                       
                 
               });
               delete data.password;
@@ -214,12 +217,11 @@ exports.authController = {
                   console.log(data1)
                   await db.agent.create({ ...agentData, userId: data1.id })
                   await emailService.sendEmail({
-                    to: [data1.email.toString()],
-                    subject: "Verify your account",
-                    text: `Dear user,
-                        @ ${companyData.companyName} just invited you to INsure! 
-                        Please click on this link (https://insure-personal-git-alice-home-alice2212.vercel.app/auth/admin/registration/setup) to setup your account
-                         `,
+                    to: [data.email.toString()],
+                subject: "Signup as an agent on INsure",
+                text: `Dear ${agentData.firstName},
+                ${companyData.companyName} just invited you to INsure! Please visit this website https://insure-personal-git-alice-home-alice2212.vercel.app/auth/admin/registration/setup to setup your account. Your verification pin is ${verifyToken}`,
+                    
 
 
                   });
