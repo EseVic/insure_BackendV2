@@ -18,7 +18,7 @@ exports.authController = {
       .findAndCountAll({
         include: [{
           model: db.company,
-          as: "cooperative",
+          as: "company",
           where: {id: companyId}
       }]
       })
@@ -43,7 +43,7 @@ exports.authController = {
       .findAndCountAll({
         include: [{
           model: db.company,
-          as: "cooperative",
+          as: "company",
           where: {id: agentId}
       }]
       })
