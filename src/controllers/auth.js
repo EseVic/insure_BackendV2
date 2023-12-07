@@ -50,9 +50,9 @@ exports.authController = {
               await emailService.sendEmail({
                 to: [data.email.toString()],
                 subject: "Verify your account",
-                text: `Dear user,
-                    @ Thanks for signing up to INsure!
-                    Your verification pin is: ${verifyToken} `,
+                text: `Dear user, 
+                             @ Thanks for signing up to INsure!
+                       Your verification pin is: ${verifyToken} `,
 
               }
 
@@ -83,9 +83,9 @@ exports.authController = {
                     {
                       to: data1.email.toString(),
                       subject: "Verify your account",
-                      text: `Dear user,
-                          @ Thanks for signing up to INsure!
-                          Your verification pin is: ${verifyToken} `,
+                      text: `Dear user, 
+                                    @ Thanks for signing up to INsure!
+                              Your verification pin is: ${verifyToken} `,
 
 
                     }
@@ -153,7 +153,8 @@ exports.authController = {
                 to: [data.email.toString()],
                 subject: "Verify your account",
                 text: `Dear user,
-                        @ ${companyData.companyName} just invited you to INsure! Please visit this website to setup your account
+                        @ ${companyData.companyName} just invited you to INsure! 
+                        Please click on this link () to setup your accoun.
                          `,
 
 
@@ -190,7 +191,8 @@ exports.authController = {
                     to: [data1.email.toString()],
                     subject: "Verify your account",
                     text: `Dear user,
-                        @ ${companyData.companyName} just invited you to INsure! Please visit this website to setup your account
+                        @ ${companyData.companyName} just invited you to INsure! 
+                        Please click on this link (https://insure-personal-git-alice-home-alice2212.vercel.app/auth/admin/registration/setup) to setup your account
                          `,
 
 
