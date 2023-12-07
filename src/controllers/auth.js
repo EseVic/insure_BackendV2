@@ -138,12 +138,17 @@ exports.authController = {
             },
           })
           .then(async (data) => {
-            if (data && data.isEmailVerified) {
+            const agentInfo = await db.agent.findOne({
+              where: {
+                email: agentData.email,
+              },
+            })
+            if (data && data.isEmailVerified && agentInfo) {
               res.status(400).send({
                 status: false,
                 message: "This Email is taken",
               });
-            } else if (data && !data.isEmailVerified) {
+            } else if (data && !data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
               const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } })
               verifyToken = generator.generate({
                 length: 5,
@@ -167,7 +172,28 @@ exports.authController = {
                 message: "Token sent to mail",
                 data,
               });
-            } else {
+            } else if (data && !data.isEmailVerified && !agentInfo.firstName && !agentInfo.lastName && agentData.firstName && agentData.lastName) {
+              await db.agent.create({ ...agentData, userId: data.id })
+              verifyToken = generator.generate({
+                length: 5,
+                numbers: true,
+              });
+              await emailService.sendEmail({
+                to: [data.email.toString()],
+                subject: "Signup as an agent on INsure",
+                text: `Dear ${agentData.firstName},
+                ${companyData.companyName} just invited you to INsure! Please visit this website ${process.env.agent_url} to setup your account. Your verification pin is ${verifyToken}`,
+                
+              });
+              delete data.password;
+              delete data.verifyToken;
+
+              res.status(200).send({
+                status: true,
+                message: "Token sent to mail",
+                data,
+              });
+            }else {
               if (agentData.password) {
                 agentData.password = bcrypt.hashSync(agentData.password, 10);
               } else {

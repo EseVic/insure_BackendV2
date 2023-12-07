@@ -25,6 +25,18 @@ module.exports = (sequelize, dataType) => {
       allowNull: true,
       trim: true,
     },
+    email: {
+      type: dataType.STRING,
+      allowNull: false,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      // validate(value) {
+      //   if (!validator.isEmail(value)) {
+      //     throw new Error('Invalid email');
+      //   }
+      // },
+    },
   });
 
   agent.associate = (models) => {
