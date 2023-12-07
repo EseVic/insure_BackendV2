@@ -47,18 +47,18 @@ module.exports = (sequelize, dataType) => {
     status: {
       type: dataType.ENUM('new', 'in progress', 'closed'),
       allowNull: false,
+      defaultValue: 'new',
+
     },
     policyNumber: {
       type: dataType.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
-    premiumAmount: {
-      type: dataType.INTEGER,
-      allowNull: false,
-    },
+   
     totalAmountPaid: {
       type: dataType.INTEGER,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: 0
     },
     role: {
       type: dataType.ENUM('leads', 'clients'),

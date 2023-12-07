@@ -10,7 +10,121 @@ const { email } = require("../config/config");
 
 
 
-exports.authController = {
+exports.companyController = {
+
+ createPolicy: () => {
+    let companyId = req.params.companyId
+    const payload = {companyProfileId: companyId, ...req.body}
+    db.policy.create(payload)
+    .then(async (data) => {
+        res.status(200).send({
+            data,
+            status: true,
+            message: "Policy created successfully",
+          });
+    })
+    .catch((err) => {
+        res.status(400).send({
+          message: err.message || "Could not find record",
+          status: false
+        });
+      });
+ },
+
+
+ updatePolicy: () => {
+    let policyId = req.params.policyId
+    const payload = req.body
+    db.policy.update(payload, {
+        where: {
+          id: policyId,
+        },
+      })
+    .then(async (data) => {
+        res.status(200).send({
+            data,
+            status: true,
+            message: "Policy updated successfully",
+          });
+    })
+    .catch((err) => {
+        res.status(400).send({
+          message: err.message || "Could not find record",
+          status: false
+        });
+      });
+ },
+
+  deletePolicy: () => {
+    let policyId = req.params.policyId
+    db.policy.delete({
+        where: {
+          id: policyId,
+        },
+      })
+    .then(async (data) => {
+        res.status(200).send({
+            data,
+            status: true,
+            message: "Policy deleted successfully",
+          });
+    })
+    .catch((err) => {
+        res.status(400).send({
+          message: err.message || "Could not find record",
+          status: false
+        });
+      });
+ },
+
+ getCompanyPolicies: () => {
+    let companyId = req.params.companyId
+  
+    db.policy.findAndCountAll({
+        where: {
+            companyProfileId: companyId
+          },
+      })
+      .then((data) => {
+        res.status(200).send({
+            data,
+            status: true,
+            message: "All Policies retrieved successfully",
+          });
+    })
+    .catch((err) => {
+        res.status(400).send({
+          message: err.message || "Could not find record",
+          status: false
+        });
+      });
+ },
+
+ getOneCompanyPolicy: () => {
+    let companyId = req.params.companyId
+    let policyId = req.params.policyId
+
+  
+    db.policy.findOne({
+        where: {
+            companyProfileId: companyId,
+            id: policyId
+          },
+      })
+      .then((data) => {
+        res.status(200).send({
+            data,
+            status: true,
+            message: "Policy created successfully",
+          });
+    })
+    .catch((err) => {
+        res.status(400).send({
+          message: err.message || "Could not find record",
+          status: false
+        });
+      });
+ },
 
  getAllCompanyAgents: (req, res) => {
     let companyId = req.params.companyId
@@ -40,7 +154,7 @@ exports.authController = {
   getSingleAgentInfo: (req, res) => {
     let agentId = req.params.agentId
     db.agent
-      .findAndCountAll({
+      .findOne({
         include: [{
           model: db.company,
           as: "company",
@@ -61,5 +175,35 @@ exports.authController = {
         });
       });
   },
+
+
+  //Records
+  getAllLeads: (req, res) => {
+  
+      db.leads
+        .findAndCountAll({
+          include: [{
+            model: db.agent,
+            as: "agent",   
+        },{
+            model: db.policy,
+            as: "policy",   
+        }],
+  
+        })
+        .then((data) => {
+          res.status(200).send({
+            data,
+            status: true,
+            message: "all agents leads retrieved successfully",
+          });
+        })
+        .catch((err) => {
+          res.status(400).send({
+            message: err.message || "Could not find record",
+            status: false
+          });
+        });
+    },
 
 }
