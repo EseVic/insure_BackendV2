@@ -101,7 +101,7 @@ exports.companyController = {
  },
 
  getOneCompanyPolicy: () => {
-    let companyId = req.params.companyId
+   
     let policyId = req.params.policyId
 
   
@@ -179,9 +179,11 @@ exports.companyController = {
 
   //Records
   getAllLeads: (req, res) => {
+    let companyId = req.params.companyId
   
       db.leads
         .findAndCountAll({
+            where: {companyId: companyId},
           include: [{
             model: db.agent,
             as: "agent",   

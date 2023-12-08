@@ -8,10 +8,14 @@ const { companyController } = require('../../controllers/company');
 
 const router = express.Router();
 
-router.post('/lead/:agentId', agentController.createLeads);
-router.get('/alleads/:agentId', agentController.getAllAgentLeads);
-router.get('/singlelead//:leadId', agentController.getSingleAgentLead);
-router.put('/updatelead/:leadId', agentController.updateLead);
+router.post('/policy/:companyId', companyController.createPolicy);
+router.get('/allcompanypolicy/:companyId', companyController.getCompanyPolicies);
+router.get('/allcompanyagent/:companyId', companyController.getAllCompanyAgents);
+router.get('/singlecompanyagent/:agentId', companyController.getSingleAgentInfo);
+router.get('/allcompanyleads/:companyId', companyController.getAllLeads);
+router.get('/singlecompanypolicy/:policyId', companyController.getOneCompanyPolicy);
+router.put('/updatepolicy/:policyId', companyController.updatePolicy);
+router.delete('/deletePolicy/:policyId', companyController.deletePolicy);
 
 
 
