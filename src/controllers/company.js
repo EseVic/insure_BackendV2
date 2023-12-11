@@ -12,7 +12,7 @@ const { email } = require("../config/config");
 
 exports.companyController = {
 
- createPolicy: () => {
+ createPolicy: (req, res) => {
     let companyId = req.params.companyId
     const payload = {companyProfileId: companyId, ...req.body}
     db.policy.create(payload)

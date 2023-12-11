@@ -1,19 +1,19 @@
 const { db } = require("../models");
-const bcrypt = require("bcryptjs");
-const { sign } = require("jsonwebtoken");
+// const bcrypt = require("bcryptjs");
+// const { sign } = require("jsonwebtoken");
 require("dotenv").config();
-const { emailService } = require('../services');
+// const { emailService } = require('../services');
 
-const axios = require("axios");
-const generator = require("generate-password");
-const { email } = require("../config/config");
+// const axios = require("axios");
+// const generator = require("generate-password");
+// const { email } = require("../config/config");
 
 
 
 exports.agentController = {
 
 
- createLeads: () => {
+ createLeads: (req, res) => {
   let agentId = req.params.agentId
   const payload = {agentId: agentId, ...req.body}
   db.leads.create(payload)

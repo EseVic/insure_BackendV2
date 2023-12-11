@@ -67,8 +67,8 @@ db.leads.belongsToMany(db.company, {through: "company_leads"});
 db.leads.hasOne(db.nextOfKin);
 db.nextOfKin.belongsTo(db.leads);
 
-db.leads.hasOne(db.policy);
-db.policy.belongsTo(db.leads);
+db.policy.hasOne(db.leads);
+db.leads.belongsTo(db.policy);
 
 db.leads.hasMany(db.claims);
 db.claims.belongsTo(db.leads);

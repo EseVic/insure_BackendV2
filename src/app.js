@@ -70,6 +70,7 @@ app.use('/middleware', agent)
 
 // intit DB
 db.sequelize.sync().catch((err) => {
+
   console.log(err);
 });
 

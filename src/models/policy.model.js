@@ -1,9 +1,5 @@
 module.exports = (sequelize, dataType) => {
   const policy = sequelize.define('policy', {
-    companyId: {
-      type: dataType.INTEGER,
-      allowNull: false,
-    },
     policyType: {
       type: dataType.STRING,
       allowNull: false,

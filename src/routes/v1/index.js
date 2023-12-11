@@ -1,9 +1,10 @@
 const express = require('express');
 const authRoute = require('./auth.route');
 const companyRoute = require('./company.route');
+const agentRoute = require('./agent.route')
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
-// const agent = require('./agent.route');
+
 
 const router = express.Router();
 

@@ -34,7 +34,7 @@ module.exports = (sequelize, dataType) => {
       allowNull: false,
       trim: true,
     },
-    Adress: {
+    Address: {
       type: dataType.STRING,
       allowNull: false,
       trim: true,
@@ -63,6 +63,7 @@ module.exports = (sequelize, dataType) => {
     role: {
       type: dataType.ENUM('leads', 'clients'),
       allowNull: false,
+      defaultValue: "leads",
       trim: true,
     },
   });

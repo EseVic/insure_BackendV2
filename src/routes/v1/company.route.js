@@ -19,7 +19,7 @@ router.delete('/deletePolicy/:policyId', companyController.deletePolicy);
 
 
 
-router.post('/login', authController.signin);
+// router.post('/login', authController.signin);
 
 
 module.exports = router;

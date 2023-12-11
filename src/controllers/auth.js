@@ -9,7 +9,7 @@ const generator = require("generate-password");
 const { email } = require("../config/config");
 
 
-
+//Company Registration
 exports.authController = {
   reg: async (req, res) => {
     const type = req.query.type;
@@ -69,6 +69,8 @@ exports.authController = {
               } else {
                 user.password = bcrypt.hashSync(user.companyName, 10);
               }
+              
+              //token verification
               user.userType = "company";
               verifyToken = generator.generate({
                 length: 5,
@@ -149,7 +151,7 @@ exports.authController = {
                 message: "This Email is taken",
               });
             } else if (data && !data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
-              const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } })
+
               verifyToken = generator.generate({
                 length: 5,
                 numbers: true,
@@ -197,6 +199,7 @@ exports.authController = {
                 data,
               });
             }else {
+              const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } })
               if (agentData.password) {
                 agentData.password = bcrypt.hashSync(agentData.password, 10);
               } else {
@@ -217,7 +220,7 @@ exports.authController = {
                   console.log(data1)
                   await db.agent.create({ ...agentData, userId: data1.id })
                   await emailService.sendEmail({
-                    to: [data.email.toString()],
+                    to: [data1.email.toString()],
                 subject: "Signup as an agent on INsure",
                 text: `Dear ${agentData.firstName},
                 ${companyData.companyName} just invited you to INsure! Please visit this website https://insure-personal-git-alice-home-alice2212.vercel.app/auth/admin/registration/setup to setup your account. Your verification pin is ${verifyToken}`,
@@ -271,6 +274,7 @@ exports.authController = {
           const user = await db.users.findOne({
             where: {
               email: req.body.email,
+              role: req.query.type
             },
           });
           if (user.verifyToken !== req.body.verifyToken) {
@@ -308,9 +312,10 @@ exports.authController = {
       case "agent":
         try {
           // const { userId } = req.decodedData;
-          const agentData = await db.agent.findOne({
+          const agentData = await db.users.findOne({
             where: {
               email: req.body.email,
+              role: req.query.type
             },
           });
           if (agentData.verifyToken !== req.body.verifyToken) {
@@ -318,7 +323,7 @@ exports.authController = {
               .status(400)
               .send({ status: false, message: "Verify account error" });
           } else {
-            const updatedUser = await db.agent.update(
+            const updatedUser = await db.users.update(
               { isEmailVerified: true },
               {
                 where: {

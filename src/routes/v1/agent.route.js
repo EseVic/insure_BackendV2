@@ -15,7 +15,7 @@ router.put('/updatelead/:leadId', agentController.updateLead);
 
 
 
-router.post('/login', authController.signin);
+// router.post('/login', authController.signin);
 
 
 module.exports = router;
