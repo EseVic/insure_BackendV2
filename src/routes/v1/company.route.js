@@ -24,20 +24,20 @@ router.delete('/deletePolicy/:policyId', companyController.deletePolicy);
 
 module.exports = router;
 
-/**
+  /**
  * @swagger
  * tags:
- *   name: Agent
- *   description: Agents management and retrieval
+ *   name: Policies
+ *   description: Policy creation and type by company admin
  */
 
 /**
  * @swagger
- * /agent:
+ * /policy/companyId:
  *   post:
- *     summary: Create an agent
- *     description: Only admins can create other users (Agents).
- *     tags: [Agent]
+ *     summary: Create Policies
+ *     description: Admin and agent can create policies.
+ *     tags: [Policies]
  *     
  *     requestBody:
  *       required: true
@@ -46,79 +46,57 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - firstName
- *               - lastName
- *               - middleName
- *               - gender
- *               - userRole
+ *               - policyType
+ *               - duration
+ *               - amount
  *             properties:
- *               firstName:
- *                 type: number
- *               lastName:
- *                 type: number
- *               middleName:
- *                 type: number
- *               gender:
- *                 type: number
- *               userRole:
+ *               policyType:
  *                 type: string
+ *               duration:
+ *                 type: string
+ *               amount:
+ *                 type: number
  *             example:
- *               firstName: john
- *               lastName: Doe
- *               middleName: any
- *               gender: M
- *               role: agent
+ *               policyType: Car Insurance
+ *               duration: 4yrs
+ *               amount: 200000
  *     responses:
  *       "201":
  *         description: Created
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/policy'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
- *             
- *
- *   get:
- *     summary: Get all users
- *     description: Only admins can retrieve all users.
- *     tags: [Users]
+ * 
+ * 
+ *  get:
+ *     summary: Get all policies
+ *     description: admins and agents can retrieve all policies.
+ *     tags: [Policies]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: name
+ *         name: policy
  *         schema:
  *           type: string
- *         description: User name
+ *         description: policy type
  *       - in: query
- *         name: role
+ *         name: duration
  *         schema:
  *           type: string
- *         description: User role
+ *         description: policy duration
  *       - in: query
- *         name: sortBy
+ *         name: amount
  *         schema:
  *           type: string
- *         description: sort by query in the form of field:desc/asc (ex. name:asc)
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *         default: 10
- *         description: Maximum number of users
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number
+ *         description: amount to be paid 
  *     responses:
  *       "200":
  *         description: OK
@@ -130,48 +108,45 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
- *                 page:
- *                   type: integer
- *                   example: 1
- *                 limit:
- *                   type: integer
- *                   example: 10
- *                 totalPages:
- *                   type: integer
- *                   example: 1
- *                 totalResults:
- *                   type: integer
- *                   example: 1
+ *                     $ref: '#/components/schemas/policy'
+ *       
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
- */
-
-/**
+ * 
+ * /**
  * @swagger
- * /users/{id}:
+ * /policy/{id}:
  *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
- *     tags: [Users]
+ *     summary: Get a policy
+ *     description: Only authorized users can fetch policy information.
+ *     tags: [Policies]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - in: query
+ *         name: policy
  *         schema:
  *           type: string
- *         description: User id
+ *         description: policy type
+ *       - in: query
+ *         name: duration
+ *         schema:
+ *           type: string
+ *         description: policy duration
+ *       - in: query
+ *         name: amount
+ *         schema:
+ *           type: string
+ *         description: amount to be paid 
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Plan'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -180,18 +155,27 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
+ *     summary: Update a policy
+ *     description: Only authorized users can update policy information.
+ *     tags: [Policies]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - in: query
+ *         name: policy
  *         schema:
  *           type: string
- *         description: User id
+ *         description: policy type
+ *       - in: query
+ *         name: duration
+ *         schema:
+ *           type: string
+ *         description: policy duration
+ *       - in: query
+ *         name: amount
+ *         schema:
+ *           type: string
+ *         description: amount to be paid 
  *     requestBody:
  *       required: true
  *       content:
@@ -199,30 +183,25 @@ module.exports = router;
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               policyType:
  *                 type: string
- *               email:
+ *               duration:
  *                 type: string
- *                 format: email
- *                 description: must be unique
- *               password:
- *                 type: string
- *                 format: password
- *                 minLength: 8
- *                 description: At least one number and one letter
+ *               amount:
+ *                 type: number
  *             example:
- *               name: fake name
- *               email: fake@example.com
- *               password: password1
+ *               policyType: Car Insurance
+ *               duration: 4yrs
+ *               amount: 200000
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Plan'
  *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
+ *         $ref: '#/components/responses/ValidationError'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -231,20 +210,29 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
- *     tags: [Users]
+ *     summary: Delete a policy
+ *     description: Only authorized users can delete policies.
+ *     tags: [Policies]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - in: query
+ *         name: policy
  *         schema:
  *           type: string
- *         description: User id
+ *         description: policy type
+ *       - in: query
+ *         name: duration
+ *         schema:
+ *           type: string
+ *         description: policy duration
+ *       - in: query
+ *         name: amount
+ *         schema:
+ *           type: string
+ *         description: amount to be paid
  *     responses:
- *       "200":
+ *       "204":
  *         description: No content
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'

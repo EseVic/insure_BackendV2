@@ -46,15 +46,18 @@ module.exports = router;
  *               - lastName
  *               - middleName
  *               - gender
+ *               - companyProfileId
  *               - userRole
  *             properties:
  *               firstName:
- *                 type: number
+ *                 type: string
  *               lastName:
- *                 type: number
+ *                 type: string
  *               middleName:
- *                 type: number
+ *                 type: string
  *               gender:
+ *                 type: string
+ *               companyProfileId:
  *                 type: number
  *               userRole:
  *                 type: string
@@ -62,7 +65,8 @@ module.exports = router;
  *               firstName: john
  *               lastName: Doe
  *               middleName: any
- *               gender: M
+ *               gender: Male
+ *               companyProfileId: 2
  *               role: agent
  *     responses:
  *       "201":
@@ -80,9 +84,9 @@ module.exports = router;
  *             
  *
  *   get:
- *     summary: Get all users
- *     description: Only admins can retrieve all users.
- *     tags: [Users]
+ *     summary: Get all agents
+ *     description: Only admins can retrieve all agents.
+ *     tags: [Agent]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -90,7 +94,7 @@ module.exports = router;
  *         name: name
  *         schema:
  *           type: string
- *         description: User name
+ *         description: Agent name
  *       - in: query
  *         name: role
  *         schema:
@@ -107,7 +111,7 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *         default: 10
- *         description: Maximum number of users
+ *         description: Maximum number of agents
  *       - in: query
  *         name: page
  *         schema:
@@ -126,7 +130,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
+ *                     $ref: '#/components/schemas/Agent'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -147,11 +151,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /users/{id}:
+ * /Agents/{id}:
  *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
- *     tags: [Users]
+ *     summary: Get an agent
+ *     description: Logged in agents can fetch only their own user information. Only admins can fetch other users.
+ *     tags: [Agent]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -167,7 +171,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Agent'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -176,9 +180,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
+ *     summary: Update a agent
+ *     description: Logged in agents can only update their own information. Only admins can update other agents.
+ *     tags: [Agent]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -187,7 +191,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Agent id
  *     requestBody:
  *       required: true
  *       content:
@@ -216,7 +220,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Agent'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -227,8 +231,8 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
+ *     summary: Delete an agent
+ *     description: Logged in agents can delete only themselves. Only admins can delete other agents.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -238,7 +242,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Agent id
  *     responses:
  *       "200":
  *         description: No content
@@ -248,4 +252,237 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
  *         $ref: '#/components/responses/NotFound'
+ */
+
+ /**
+ * @swagger
+ * /agent/login:
+ *   post:
+ *     summary: Login
+ *     tags: [Agent]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *             example:
+ *               email: fake@example.com
+ *               password: password1
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   $ref: '#/components/schemas/AuthTokens'
+ *       "401":
+ *         description: Invalid email or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               code: 401
+ *               message: Invalid email or password
+ */
+
+/**
+ * @swagger
+ * /agent/logout:
+ *   post:
+ *     summary: Logout
+ *     tags: [Agent]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *             example:
+ *               refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
+ *     responses:
+ *       "204":
+ *         description: No content
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
+
+
+
+/**
+ * @swagger
+ * /agent/lead:
+ *   post:
+ *     summary: Create a new lead
+ *     description: Only agents can create leads.
+ *     tags: [Lead]
+ *     
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - middleName
+ *               - gender
+ *               - email
+ *               - address
+ *               - phoneNumber
+ *               - status
+ *               - policyNumber
+ *               - totalAmountPaid
+ *               - policyId
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               middleName:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               status:
+ *                 type: enum
+ *               policyNumber:
+ *                 type: string
+ *               totalAmountPaid:
+ *                 type: number
+ *               policyId:
+ *                 type: number
+ *             example:
+ *               firstName: john
+ *               lastName: Doe
+ *               middleName: any
+ *               gender: Male
+ *               email: elizabeth_leo@gmail.com
+ *               address: 24 Gucci street, Lagos
+ *               phoneNumber: 081 46789 2435
+ *               status: New
+ *               policyNumber: vet46yy2
+ *               totalAmountPaid: 480000
+ *               policyId: 3
+ *     responses:
+ *       "201":
+ *         description: Created
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/User'
+ *       "400":
+ *         $ref: '#/components/responses/DuplicateEmail'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *             
+ *
+ *   get:
+ *     summary: Get all leads
+ *     description: Admins and Agents can retrieve all leads.
+ *     tags: [Lead]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: lead name
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: lead email
+ *       - in: query
+ *         name: gender
+ *         schema:
+ *           type: string
+ *         description: lead's gender
+ *       - in: query
+ *         name: address
+ *         schema:
+ *           type: string
+ *         description: lead's address
+ *       - in: query
+ *         name: phoneNumber
+ *         schema:
+ *           type: integer
+ *           minimum: 11
+ *           default: 11
+ *         description: lead's phoneNumber
+ *       - in: query
+ *         name: policyNumber
+ *         schema:
+ *           type: string
+ *         description: lead's policyNumber
+ *       - in: query
+ *         name: totalAmountPaid
+ *         schema:
+ *           type: integer
+ *           minimum: 1000
+ *           default: 1
+ *         description: total amount paid
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         description: the status of the lead
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 page:
+ *                   type: integer
+ *                   example: 1
+ *                 limit:
+ *                   type: integer
+ *                   example: 10
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 1
+ *                 totalResults:
+ *                   type: integer
+ *                   example: 1
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
  */
