@@ -2,6 +2,9 @@ const express = require('express');
 const authRoute = require('./auth.route');
 const companyRoute = require('./company.route');
 const agentRoute = require('./agent.route')
+const dashboardRoute = require('./dashboard')
+const claimsRoute = require('./claim')
+
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -21,6 +24,18 @@ const defaultRoutes = [
   {
     path: '/agent',
     route: agentRoute,
+  },
+  {
+    path: '/agent',
+    route: agentRoute,
+  },
+  {
+    path: '/dash',
+    route: dashboardRoute,
+  },
+  {
+    path: '/claim',
+    route: claimsRoute,
   },
 ];
 
