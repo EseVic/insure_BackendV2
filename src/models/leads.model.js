@@ -40,7 +40,7 @@ module.exports = (sequelize, dataType) => {
       trim: true,
     },
     phoneNumber: {
-      type: dataType.INTEGER,
+      type: dataType.STRING,
       allowNull: false,
       trim: true,
     },
@@ -51,7 +51,7 @@ module.exports = (sequelize, dataType) => {
 
     },
     policyNumber: {
-      type: dataType.INTEGER,
+      type: dataType.STRING,
       allowNull: true,
     },
    

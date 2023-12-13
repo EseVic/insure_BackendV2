@@ -12,15 +12,15 @@ if (config.env !== 'test') {
     .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
 }
 
-const transporter = nodemailer.createTransport(
-  {
-    service: "Hotmail",
-    auth: {
-      user: "insure97@outlook.com",
-      pass: "246@insure"
-    }
-  }
-);
+// const transporter = nodemailer.createTransport(
+//   {
+//     service: "Hotmail",
+//     auth: {
+//       user: "insure97@outlook.com",
+//       pass: "246@insure"
+//     }
+//   }
+// );
 
 
 // var transporter = nodemailer.createTransport({
@@ -39,11 +39,11 @@ const transporter = nodemailer.createTransport(
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to) => {
-  const msg = { from: process.env.EMAIL_FROM, ...to};
-  console.log(msg)
- const trans =  await transporter.sendMail(msg);
- console.log(trans)
+const sendEmail = async (to, subject, text) => {
+  const msg = { from: process.env.EMAIL_FROM, to, subject, text};
+  // console.log(msg)
+ const trans =  await transport.sendMail(msg);
+//  console.log(trans)
 };
 
 /**

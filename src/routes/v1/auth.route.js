@@ -3,25 +3,24 @@ const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 // const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
-const {authController} = require('../../controllers/auth');
+const authController = require('../../controllers/auth');
 
 
 const router = express.Router();
-router.post('/register', authController.reg);
-router.post('/verify', authController.verifyAccount);
+// router.post('/register', authController.reg);
+// router.post('/verify', authController.verifyAccount);
 
-router.post('/login', authController.signin);
+// router.post('/login', authController.signin);
 
 
-// router.post('/register', validate(authValidation.register), authController.register);
-// router.post('/login', validate(authValidation.login), authController.login);
-// router.post('/logout', validate(authValidation.logout), authController.logout);
-// router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
-// router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
-// router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
-// router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
-// router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
-// router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
+router.post('/register', authController.register);
+router.post('/login',  authController.login);
+router.post('/logout', validate(authValidation.logout), authController.logout);
+router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
+router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
+router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
+router.post('/verify',  authController.verifyEmail);
+
 
 
 
@@ -36,9 +35,9 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/register:
+ * /auth/register?type=company:
  *   post:
- *     summary: Register as user
+ *     summary: Register as company
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -85,7 +84,7 @@ module.exports = router;
  *               email: insure@gmail.com
  *               password: Password1@
  *               phoneNumber: Password1@
-*               role: Admin
+*               role: company
  *     responses:
  *       "201":
  *         description: Created
@@ -104,7 +103,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/login:
+ * /auth/login?type=company:
  *   post:
  *     summary: Login
  *     tags: [Auth]
@@ -150,9 +149,10 @@ module.exports = router;
  *               message: Invalid email or password
  */
 
+
 /**
  * @swagger
- * /auth/logout:
+ * /auth/signin?type=company:
  *   post:
  *     summary: Logout
  *     tags: [Auth]

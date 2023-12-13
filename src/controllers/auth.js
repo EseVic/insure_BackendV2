@@ -1,483 +1,479 @@
-const { db } = require("../models");
-const bcrypt = require("bcryptjs");
-const { sign } = require("jsonwebtoken");
-require("dotenv").config();
-const { emailService } = require('../services');
+const { db } = require('../models');
+const bcrypt = require('bcryptjs');
+const generator = require('generate-password');
+const httpStatus = require('http-status');
+const catchAsync = require('../utils/catchAsync');
+const { authService, userService, tokenService, emailService } = require('../services');
 
-const axios = require("axios");
-const generator = require("generate-password");
-const { email } = require("../config/config");
-
-
-//Company Registration
-exports.authController = {
-  reg: async (req, res) => {
-    const type = req.query.type;
-    console.log(type)
-    let verifyToken = "";
-    let emaildata = {};
-    switch (type) {
-      case "company":
-        const user = req.body;
-        console.log(user)
-        if (!req.body || !req.body.email) {
-          res.status(400).send({
-            status: false,
-            message: "error",
-          });
-        }
-        db.users
-          .findOne({
-            where: {
-              email: user.email,
-            },
-          })
-          .then(async (data) => {
-
-            if (data && data.isEmailVerified) {
-              res.status(404).send({
-                status: false,
-                message: "This Email is taken",
-              });
-            } else if (data && !data.isEmailVerified) {
-
-              verifyToken = generator.generate({
-                length: 5,
-                numbers: true,
-              });
-              await db.users.update(verifyToken, { where: { id: data.id } })
-              console.log(data.email)
-              await emailService.sendEmail({
-                to: [data.email.toString()],
-                subject: "Verify your account",
-                text: `Dear user, 
-                      Thanks for signing up to INsure!
-                      Your verification pin is: ${verifyToken}`,
-
-              }
-
-              );
-
-              res.status(200).send({
-                status: true,
-                message: "Token sent to mail",
-                // newData,
-              });
-            } else {
-              if (user.password) {
-                user.password = bcrypt.hashSync(user.password, 10);
-              } else {
-                user.password = bcrypt.hashSync(user.companyName, 10);
-              }
-              
-              //token verification
-              user.userType = "company";
-              verifyToken = generator.generate({
-                length: 5,
-                numbers: true,
-              });
-              user.verifyToken = verifyToken;
-              db.users
-                .create(user)
-                .then(async (data1) => {
-                  await db.company.create({ ...user, userId: data1.id })
-                  await emailService.sendEmail(
-                    {
-                      to: data1.email.toString(),
-                      subject: "Verify your account",
-                      text: `Dear user, 
-                            Thanks for signing up to INsure!
-                            Your verification pin is: ${verifyToken} `,
-
-
-                    }
-
-
-                  )
-                  delete data1.password;
-                  delete data1.verifyToken;
-                  const respayload = {
-                    id: data1.id,
-                    firstName: data1.firstName,
-                    lastName: data1.lastName,
-                    email: data1.email,
-                    phoneNumber: data1.phoneNumber,
-                  };
-
-                  res.status(200).send({
-                    status: true,
-                    message: "Token sent to mail",
-                    data: respayload,
-                  });
-                })
-                .catch((error) => {
-                  res.status(400).send({
-                    status: false,
-                    message: error.message,
-                  });
-                });
-            }
-          })
-          .catch((error) => {
-            res.status(400).send({
+const register = catchAsync(async (req, res) => {
+  const type = req.query.type;
+  // console.log(type)
+  let verifyToken = '';
+  // let emaildata = {};
+  switch (type) {
+    case 'company':
+      const user = req.body;
+      // console.log(user);
+      if (!req.body || !req.body.email) {
+        res.status(400).send({
+          status: false,
+          message: 'All field required',
+        });
+      }
+      db.users
+        .findOne({
+          where: {
+            email: user.email,
+          },
+        })
+        .then(async (data) => {
+          if (data && data.isEmailVerified) {
+            res.status(404).send({
               status: false,
-              message: error.message,
+              message: 'This Email is taken',
             });
-          });
-        break;
-      case "agent":
-        const agentData = req.body;
-        if (!req.body || !req.body.email) {
+          } else if (data && !data.isEmailVerified) {
+            verifyToken = generator.generate({
+              length: 5,
+              numbers: true,
+            });
+            await db.users.update(verifyToken, { where: { id: data.id } });
+            console.log(data.email);
+            await emailService.sendEmail({
+              to: [data.email.toString()],
+              subject: 'Verify your account',
+              text: `Dear user, 
+                Thanks for signing up to INsure! Your verification pin is: ${verifyToken}`,
+            });
+
+            res.status(200).send({
+              status: true,
+              message: 'Token sent to mail',
+              // newData,
+            });
+          } else {
+            if (user.password) {
+              user.password = bcrypt.hashSync(user.password, 10);
+            } else {
+              user.password = bcrypt.hashSync(user.companyName, 10);
+            }
+
+            //token verification
+            user.userType = 'company';
+            verifyToken = generator.generate({
+              length: 5,
+              numbers: true,
+            });
+            user.verifyToken = verifyToken;
+            db.users
+              .create(user)
+              .then(async (data1) => {
+                await db.company.create({ ...user, userId: data1.id });
+                await emailService.sendEmail({
+                  to: data1.email.toString(),
+                  subject: 'Verify your account',
+                  text: `Dear user, 
+                      Thanks for signing up to INsure! Your verification pin is: ${verifyToken} `,
+                });
+                delete data1.password;
+                delete data1.verifyToken;
+                const respayload = {
+                  id: data1.id,
+                  firstName: data1.firstName,
+                  lastName: data1.lastName,
+                  email: data1.email,
+                  phoneNumber: data1.phoneNumber,
+                };
+
+                res.status(200).send({
+                  status: true,
+                  message: 'Token sent to mail',
+                  data: respayload,
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+                res.status(400).send({
+                  status: false,
+                  message: error.message,
+                });
+              });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
           res.status(400).send({
             status: false,
-            message: "error",
+            message: error.message,
           });
-        }
-        db.users
-          .findOne({
+        });
+      break;
+    case 'agent':
+      const agentData = req.body;
+      if (!req.body || !req.body.email) {
+        res.status(400).send({
+          status: false,
+          message: 'error',
+        });
+      }
+      db.users
+        .findOne({
+          where: {
+            email: agentData.email,
+          },
+        })
+        .then(async (data) => {
+          const agentInfo = await db.agent.findOne({
             where: {
               email: agentData.email,
             },
-          })
-          .then(async (data) => {
-            const agentInfo = await db.agent.findOne({
-              where: {
-                email: agentData.email,
-              },
-            })
-            if (data && data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
-              res.status(400).send({
-                status: false,
-                message: "This Email is taken",
-              });
-            } else if (data && !data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
+          });
+          if (data && data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
+            res.status(400).send({
+              status: false,
+              message: 'This Email is taken',
+            });
+          } else if (data && !data.isEmailVerified && agentInfo.firstName && agentInfo.lastName) {
+            verifyToken = generator.generate({
+              length: 5,
+              numbers: true,
+            });
+            await emailService.sendEmail({
+              to: [data.email.toString()],
+              subject: 'Verify your account',
+              text: `Dear user,
+                    Your verification pin is ${verifyToken}`,
+            });
+            delete data.password;
+            delete data.verifyToken;
 
-              verifyToken = generator.generate({
-                length: 5,
-                numbers: true,
-              });
-              await emailService.sendEmail({
-                to: [data.email.toString()],
-                subject: "Verify your account",
-                text: `Dear user,
-                      Your verification pin is ${verifyToken}`,
-
-
-              });
-              delete data.password;
-              delete data.verifyToken;
-
-              res.status(200).send({
-                status: true,
-                message: "Token sent to mail",
-                data,
-              });
-            } else if (data && !data.isEmailVerified && !agentInfo.firstName && !agentInfo.lastName && agentData.firstName && agentData.lastName) {
-              await db.agent.update({ ...agentData, userId: data.id }, {
+            res.status(200).send({
+              status: true,
+              message: 'Token sent to mail',
+              data,
+            });
+          } else if (
+            data &&
+            !data.isEmailVerified &&
+            !agentInfo.firstName &&
+            !agentInfo.lastName &&
+            agentData.firstName &&
+            agentData.lastName
+          ) {
+            await db.agent.update(
+              { ...agentData, userId: data.id },
+              {
                 where: {
                   id: agentInfo.id,
                 },
-              } )
-              verifyToken = generator.generate({
-                length: 5,
-                numbers: true,
-              });
-              await emailService.sendEmail({
-                to: [data.email.toString()],
-                subject: "Verify your account",
-                text: `Dear user,
-                      Your verification pin is ${verifyToken}`,
-                       
-                
-              });
-              delete data.password;
-              delete data.verifyToken;
-
-              res.status(200).send({
-                status: true,
-                message: "Token sent to mail",
-                data,
-              });
-            }else {
-              const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } })
-              if (agentData.password) {
-                agentData.password = bcrypt.hashSync(agentData.password, 10);
-              } else {
-                agentData.password = bcrypt.hashSync(
-                  agentData.firstName,
-                  10
-                );
               }
-              verifyToken = generator.generate({
-                length: 5,
-                numbers: true,
-              });
-              agentData.verifyToken = verifyToken;
-              agentData.role = "agent";
-              db.users
-                .create(agentData)
-                .then(async (data1) => {
-                  console.log(data1)
-                  await db.agent.create({ ...agentData, userId: data1.id })
-                  await emailService.sendEmail({
-                    to: [data1.email.toString()],
-                subject: "Signup as an agent on INsure",
-                text: `Dear ${agentData.firstName},
-                ${companyData.companyName} just invited you to INsure! Please visit this website https://insure-personal-git-alice-home-alice2212.vercel.app/auth/admin/registration/setup to setup your account. Your verification pin is ${verifyToken}`,
-                    
+            );
+            verifyToken = generator.generate({
+              length: 5,
+              numbers: true,
+            });
+            await emailService.sendEmail({
+              to: [data.email.toString()],
+              subject: 'Verify your account',
+              text: `Dear user,
+                    Your verification pin is ${verifyToken}`,
+            });
+            delete data.password;
+            delete data.verifyToken;
 
-
-                  });
-                  delete data1.password;
-                  delete data1.verifyToken;
-                  const respayload = {
-                    id: data1.id,
-                    cooperativeName: data1.cooperativeName,
-                    email: data1.email,
-                    phoneNumber: data1.phoneNumber,
-                  };
-                  res.status(200).send({
-                    status: true,
-                    message: "Token sent to mail",
-                    data: respayload,
-                  });
-                })
-                .catch((error) => {
-                  res.status(400).send({
-                    status: false,
-                    message: error.message,
-                  });
+            res.status(200).send({
+              status: true,
+              message: 'Token sent to mail',
+              data,
+            });
+          } else {
+            const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } });
+            if (agentData.password) {
+              agentData.password = bcrypt.hashSync(agentData.password, 10);
+            } else {
+              agentData.password = bcrypt.hashSync(agentData.firstName, 10);
+            }
+            verifyToken = generator.generate({
+              length: 5,
+              numbers: true,
+            });
+            agentData.verifyToken = verifyToken;
+            agentData.role = 'agent';
+            db.users
+              .create(agentData)
+              .then(async (data1) => {
+                console.log(data1);
+                await db.agent.create({ ...agentData, userId: data1.id });
+                const emailData = {
+                  to: [data1.email.toString()],
+                  subject: 'Signup as an agent on INsure',
+                  text: `Dear ${agentData.firstName},
+              ${companyData.companyName} just invited you to INsure! Please visit this https://insure-personal-git-alice-home-alice2212.vercel.app/auth/agent/registration to setup your account. 
+                    Your verification pin is ${verifyToken}`,
+                }
+                await emailService.sendEmail(emailData.to, emailData.subject, emailData.text);
+                delete data1.password;
+                delete data1.verifyToken;
+                const respayload = {
+                  id: data1.id,
+                  cooperativeName: data1.cooperativeName,
+                  email: data1.email,
+                  phoneNumber: data1.phoneNumber,
+                };
+                res.status(200).send({
+                  status: true,
+                  message: 'Token sent to mail',
+                  data: respayload,
                 });
-            }
-          })
-          .catch((error) => {
-            res.status(400).send({
-              status: false,
-              message: error.message,
-            });
-          });
-        break;
-      default:
-        return res
-          .status(400)
-          .send({ message: "No type for user", status: false });
-    }
-  },
-
-  verifyAccount: async (req, res) => {
-    const type = req.query.type;
-
-    switch (type) {
-      case "company":
-        try {
-          // const { userId } = req.decodedData;
-          const user = await db.users.findOne({
-            where: {
-              email: req.body.email,
-              role: req.query.type
-            },
-          });
-          if (user.verifyToken !== req.body.verifyToken) {
-            res
-              .status(400)
-              .send({ status: false, message: "Verify account error" });
-          } else {
-            const updatedUser = await db.users.update(
-              { isEmailVerified: true },
-              {
-                where: {
-                  id: user.id,
-                },
-              }
-            );
-            if (!updatedUser) {
-              res.status(400).send({
-                status: false,
-                message: "Verify account error",
+              })
+              .catch((error) => {
+                res.status(400).send({
+                  status: false,
+                  message: error.message,
+                });
               });
-            }
-
-            res.status(200).send({
-              status: true,
-              message: "Successfully verified your account",
-            });
           }
-        } catch (error) {
+        })
+        .catch((error) => {
           res.status(400).send({
             status: false,
-            message: error?.message ?? "Verify account error",
+            message: error.message,
           });
-        }
-        break;
-      case "agent":
-        try {
-          // const { userId } = req.decodedData;
-          const agentData = await db.users.findOne({
-            where: {
-              email: req.body.email,
-              role: req.query.type
-            },
-          });
-          if (agentData.verifyToken !== req.body.verifyToken) {
-            res
-              .status(400)
-              .send({ status: false, message: "Verify account error" });
-          } else {
-            const updatedUser = await db.users.update(
-              { isEmailVerified: true },
-              {
-                where: {
-                  id: agentData.id,
-                },
-              }
-            );
-            if (!updatedUser) {
-              res.status(400).send({
-                status: false,
-                message: "Verify account error",
-              });
-            }
+        });
+      break;
+    default:
+      return res.status(400).send({ message: 'No type for user', status: false });
+  }
+});
 
-            res.status(200).send({
-              status: true,
-              message: "Successfully verified your account",
-            });
-          }
-        } catch (error) {
-          res.status(400).send({
+const login = catchAsync(async (req, res) => {
+  const type = req.query.type;
+
+  switch (type) {
+    case 'company':
+      try {
+        const user = await db.users.findOne({
+          where: { email: req.body.email },
+          include: [{ model: db.company, as: 'companyProfile' }],
+        });
+        // if record doesn't exist
+        if (!user) {
+          return res.status(404).send({
             status: false,
-            message: error?.message ?? "Verify account error",
+            message: 'Invalid username or password',
           });
         }
-        break;
-      default:
-        return res
-          .status(400)
-          .send({ message: "No type for user", status: false });
-    }
-  },
-  
-  signin: async (req, res) => {
-    const type = req.query.type;
 
-    switch (type) {
-      case "company":
-        try {
-          const user = await db.users.findOne({
-            where: { email: req.body.email },
-            include: [{ model: db.company, as: "companyProfile" }],
+        if (!user.isEmailVerified) {
+          return res.status(404).send({
+            status: false,
+            message: 'verify account first',
           });
+        }
+
+        // compare the request password with the hashed password saved in the database
+        let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+
+        // // if password is not valid
+        if (!passwordIsValid) {
+          return res.status(404).send({
+            accessToken: null,
+            message: 'Invalid username or password',
+            status: false,
+          });
+        }
+        delete user.password;
+        delete user.verifyToken;
+
+        let payload = {
+          userId: user.id,
+          userType: user.userType,
+        };
+        const tokens = await tokenService.generateAuthTokens(user.id)
+        res.status(200).send({
+          status: true,
+          data: {user, tokens},
+          // accessToken: token,
+          message: 'successfully logged in',
+        });
+      } catch (err) {
+        res.status(400).send({
+          status: false,
+          message: 'Could not fetch record' + err,
+        });
+      }
+
+      break;
+    case 'agent':
+      await db.users
+        .findOne({
+          where: { email: req.body.email },
+          include: [{ model: db.company, as: 'agent' }],
+        })
+        .then((agentData) => {
           // if record doesn't exist
-          if (!user) {
+          if (!agentData) {
             return res.status(404).send({
-              status: false,
-              message: "Invalid username or password",
+              message: 'Invalid username or password',
             });
           }
-
-          if (!user.isEmailVerified) {
+          if (!agentData.isEmailVerified) {
             return res.status(404).send({
               status: false,
-              message: "verify account first",
+              message: ' verify account first',
             });
           }
-
           // compare the request password with the hashed password saved in the database
-          let passwordIsValid = bcrypt.compareSync(
-            req.body.password,
-            user.password
-          );
+          let passwordIsValid = bcrypt.compareSync(req.body.password, agentData.password);
 
-          // // if password is not valid
+          // if password is not valid
           if (!passwordIsValid) {
             return res.status(404).send({
               accessToken: null,
-              message: "Invalid username or password",
-              status: false,
+              message: 'Invalid username or password',
             });
           }
-          delete user.password;
-          delete user.verifyToken;
 
           let payload = {
-            userId: user.id,
-            userType: user.userType,
+            agentId: agentData.id,
+            userType: agentData.userType,
           };
+          delete agentData.password;
+          delete agentData.verifyToken;
 
-          
           res.status(200).send({
             status: true,
-            data: user,
+            data: agentData,
             // accessToken: token,
-            message: "successfully logged in",
+            message: 'successfully logged in',
           });
-        } catch (err) {
+        })
+        .catch((err) => {
           res.status(400).send({
             status: false,
-            message: "Could not fetch record" + err,
+            message: 'Could not fetch record',
           });
-        }
+        });
+      break;
+    default:
+      return res.status(400).send({ message: 'No type for user', status: false });
+  }
+});
 
-        break;
-      case "agent":
-        await db.users.findOne({
-          where: { email: req.body.email },
-          include: [{ model: db.company, as: "agent" }],
-        })
-          .then((agentData) => {
-            // if record doesn't exist
-            if (!agentData) {
-              return res.status(404).send({
-                message: "Invalid username or password",
-              });
+const logout = catchAsync(async (req, res) => {
+  await authService.logout(req.body.refreshToken);
+  res.status(httpStatus.OK).send("logged out successfully!");
+});
+
+const refreshTokens = catchAsync(async (req, res) => {
+  const tokens = await authService.refreshAuth(req.body.refreshToken);
+  res.send({ ...tokens });
+});
+
+const forgotPassword = catchAsync(async (req, res) => {
+  const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
+  await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  await authService.resetPassword(req.query.token, req.body.password);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+  const type = req.query.type;
+
+  switch (type) {
+    case 'company':
+      try {
+        // const { userId } = req.decodedData;
+        const user = await db.users.findOne({
+          where: {
+            email: req.body.email,
+            role: req.query.type,
+          },
+        });
+        if (user.verifyToken !== req.body.verifyToken) {
+          res.status(400).send({ status: false, message: 'Verify account error' });
+        } else {
+          const updatedUser = await db.users.update(
+            { isEmailVerified: true },
+            {
+              where: {
+                id: user.id,
+              },
             }
-            if (!agentData.isEmailVerified) {
-              return res.status(404).send({
-                status: false,
-                message: " verify account first",
-              });
-            }
-            // compare the request password with the hashed password saved in the database
-            let passwordIsValid = bcrypt.compareSync(
-              req.body.password,
-              agentData.password
-            );
-
-            // if password is not valid
-            if (!passwordIsValid) {
-              return res.status(404).send({
-                accessToken: null,
-                message: "Invalid username or password",
-              });
-            }
-
-            let payload = {
-              agentId: agentData.id,
-              userType: agentData.userType,
-            };
-            delete agentData.password;
-            delete agentData.verifyToken;
-          
-
-
-            res.status(200).send({
-              status: true,
-              data: agentData,
-              // accessToken: token,
-              message: "successfully logged in",
-            });
-          })
-          .catch((err) => {
+          );
+          if (!updatedUser) {
             res.status(400).send({
               status: false,
-              message: "Could not fetch record",
+              message: 'Verify account error',
             });
+          }
+
+          res.status(200).send({
+            status: true,
+            message: 'Successfully verified your account',
           });
-        break;
-      default:
-        return res
-          .status(400)
-          .send({ message: "No type for user", status: false });
-    }
-  },
-}
+        }
+      } catch (error) {
+        res.status(400).send({
+          status: false,
+          message: error?.message ?? 'Verify account error',
+        });
+      }
+      break;
+    case 'agent':
+      try {
+        // const { userId } = req.decodedData;
+        const agentData = await db.users.findOne({
+          where: {
+            email: req.body.email,
+            role: req.query.type,
+          },
+        });
+        if (agentData.verifyToken !== req.body.verifyToken) {
+          res.status(400).send({ status: false, message: 'Verify account error' });
+        } else {
+          const updatedUser = await db.users.update(
+            { isEmailVerified: true },
+            {
+              where: {
+                id: agentData.id,
+              },
+            }
+          );
+          if (!updatedUser) {
+            res.status(400).send({
+              status: false,
+              message: 'Verify account error',
+            });
+          }
+
+          res.status(200).send({
+            status: true,
+            message: 'Successfully verified your account',
+          });
+        }
+      } catch (error) {
+        res.status(400).send({
+          status: false,
+          message: error?.message ?? 'Verify account error',
+        });
+      }
+      break;
+    default:
+      return res.status(400).send({ message: 'No type for user', status: false });
+  }
+});
+
+module.exports = {
+  register,
+  login,
+  logout,
+  refreshTokens,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+};

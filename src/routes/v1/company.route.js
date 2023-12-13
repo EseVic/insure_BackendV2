@@ -31,10 +31,10 @@ module.exports = router;
  *   description: Policy creation and type by company admin
  */
 
-/**
+ /**
  * @swagger
  * /policy/companyId:
- *   post:
+ *  post:
  *     summary: Create Policies
  *     description: Admin and agent can create policies.
  *     tags: [Policies]
@@ -114,8 +114,8 @@ module.exports = router;
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
- * 
- * /**
+ */
+ /**
  * @swagger
  * /policy/{id}:
  *   get:

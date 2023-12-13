@@ -1,20 +1,23 @@
 const Sequelize = require('sequelize');
 const { sequelize } = require('../config/config');
 const logger = require('../config/logger');
+const fs = require("fs");
 
 // const sequelizeInstance = new Sequelize(sequelize.url);
 const db = {};
 
-const sequelizeInstance = new Sequelize(sequelize.database, sequelize.user, sequelize.password, {
-  host: sequelize.host,
-  dialect: sequelize.dialect,
-  pool: {
-    min: 0,
-    max: 100,
-    acquire: 5000,
-    Idle: 1000,
-  },
-});
+// const sequelizeInstance = new Sequelize(sequelize.database, sequelize.user, sequelize.password, {
+//   host: sequelize.host,
+//   dialect: sequelize.dialect,
+//   pool: {
+//     min: 0,
+//     max: 100,
+//     acquire: 5000,
+//     Idle: 1000,
+//   },
+// });
+
+const sequelizeInstance = new Sequelize(sequelize.url);
 
 sequelizeInstance
   .authenticate()

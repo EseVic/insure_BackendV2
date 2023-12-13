@@ -29,7 +29,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /agent:
+ * /auth/Register?type=agent:
  *   post:
  *     summary: Create an agent
  *     description: Only admins can create other users (Agents).
@@ -46,6 +46,7 @@ module.exports = router;
  *               - lastName
  *               - middleName
  *               - gender
+ *               - email
  *               - companyProfileId
  *               - userRole
  *             properties:
@@ -57,6 +58,8 @@ module.exports = router;
  *                 type: string
  *               gender:
  *                 type: string
+ *               email:
+ *                 type: string
  *               companyProfileId:
  *                 type: number
  *               userRole:
@@ -66,6 +69,7 @@ module.exports = router;
  *               lastName: Doe
  *               middleName: any
  *               gender: Male
+ *               email: fake@example.com
  *               companyProfileId: 2
  *               role: agent
  *     responses:

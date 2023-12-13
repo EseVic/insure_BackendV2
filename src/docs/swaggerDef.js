@@ -13,8 +13,11 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: `http://localhost:${config.port}/v1`,
+      url: `https://insure-8vvy.onrender.com/v1`,
     },
+    {
+      url: `http://localhost:3000/v1/`
+    }
   ],
 };
 
