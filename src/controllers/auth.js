@@ -37,19 +37,20 @@ const register = catchAsync(async (req, res) => {
               length: 5,
               numbers: true,
             });
-            await db.users.update(verifyToken, { where: { id: data.id } });
-            console.log(data.email);
-            await emailService.sendEmail({
-              to: [data.email.toString()],
-              subject: 'Verify your account',
-              text: `Dear user, 
-                Thanks for signing up to INsure! Your verification pin is: ${verifyToken}`,
-            });
+            
+            const to = [data.email.toString()];
+            const subject = 'Verify your account';
+            const text = `Dear user, 
+                Thanks for signing up to INsure! Your verification pin is: ${verifyToken}`;
+            await emailService.sendEmail(to, subject, text);
+            await db.users.update({verifyToken: verifyToken}, { where: { id: data.id } });
 
             res.status(200).send({
               status: true,
               message: 'Token sent to mail',
-              // newData,
+              data
+
+            
             });
           } else {
             if (user.password) {
@@ -69,12 +70,11 @@ const register = catchAsync(async (req, res) => {
               .create(user)
               .then(async (data1) => {
                 await db.company.create({ ...user, userId: data1.id });
-                await emailService.sendEmail({
-                  to: data1.email.toString(),
-                  subject: 'Verify your account',
-                  text: `Dear user, 
-                      Thanks for signing up to INsure! Your verification pin is: ${verifyToken} `,
-                });
+                const to = [data1.email.toString()];
+                const subject = 'Verify your account';
+                const text = `Dear user,
+                Thanks for signing up to INsure! Your verification pin is: ${verifyToken}`;
+                await emailService.sendEmail(to, subject, text);
                 delete data1.password;
                 delete data1.verifyToken;
                 const respayload = {
@@ -138,14 +138,14 @@ const register = catchAsync(async (req, res) => {
               length: 5,
               numbers: true,
             });
-            await emailService.sendEmail({
-              to: [data.email.toString()],
-              subject: 'Verify your account',
-              text: `Dear user,
-                    Your verification pin is ${verifyToken}`,
-            });
-            delete data.password;
-            delete data.verifyToken;
+            const to = [data.email.toString()];
+            const subject = 'Verify your account';
+            const text = `Dear user,
+                Your verification pin is ${verifyToken}`;
+            await emailService.sendEmail(to, subject, text);
+            await db.users(verifyToken, {where: {id: data.id}})
+            // delete data.password;
+            // delete data.verifyToken;
 
             res.status(200).send({
               status: true,
@@ -168,16 +168,25 @@ const register = catchAsync(async (req, res) => {
                 },
               }
             );
-            verifyToken = generator.generate({
-              length: 5,
-              numbers: true,
-            });
-            await emailService.sendEmail({
-              to: [data.email.toString()],
-              subject: 'Verify your account',
-              text: `Dear user,
-                    Your verification pin is ${verifyToken}`,
-            });
+            // console.log(data.id)
+            await db.users.update(
+              { phoneNumber: agentData.phoneNumber },
+              {
+                where: {
+                  id: data.id,
+                },
+              }
+            );
+            // verifyToken = generator.generate({
+            //   length: 5,
+            //   numbers: true,
+            // });
+            // const to = [data.email.toString()];
+            // const subject = 'Verify your account';
+            // const text = `Dear user,
+            //     Your verification pin is ${verifyToken}`;
+            // await emailService.sendEmail(to, subject, text);
+            // await db.users(verifyToken, {where: {id: data.id}})
             delete data.password;
             delete data.verifyToken;
 
@@ -188,10 +197,11 @@ const register = catchAsync(async (req, res) => {
             });
           } else {
             const companyData = await db.company.findOne({ where: { id: agentData.companyProfileId } });
+            console.log(agentData)
             if (agentData.password) {
               agentData.password = bcrypt.hashSync(agentData.password, 10);
             } else {
-              agentData.password = bcrypt.hashSync(agentData.firstName, 10);
+              agentData.password = bcrypt.hashSync(agentData.email, 10);
             }
             verifyToken = generator.generate({
               length: 5,
@@ -199,6 +209,7 @@ const register = catchAsync(async (req, res) => {
             });
             agentData.verifyToken = verifyToken;
             agentData.role = 'agent';
+            console.log(agentData)
             db.users
               .create(agentData)
               .then(async (data1) => {
@@ -207,23 +218,28 @@ const register = catchAsync(async (req, res) => {
                 const emailData = {
                   to: [data1.email.toString()],
                   subject: 'Signup as an agent on INsure',
-                  text: `Dear ${agentData.firstName},
+                  text: `Dear agent,
               ${companyData.companyName} just invited you to INsure! Please visit this https://insure-personal-git-alice-home-alice2212.vercel.app/auth/agent/registration to setup your account. 
                     Your verification pin is ${verifyToken}`,
-                }
+                };
                 await emailService.sendEmail(emailData.to, emailData.subject, emailData.text);
                 delete data1.password;
                 delete data1.verifyToken;
-                const respayload = {
-                  id: data1.id,
-                  cooperativeName: data1.cooperativeName,
-                  email: data1.email,
-                  phoneNumber: data1.phoneNumber,
-                };
+                // const respayload = {
+                //   id: data1.id,
+                //   cooperativeName: data1.cooperativeName,
+                //   email: data1.email,
+                //   phoneNumber: data1.phoneNumber,
+                // };
+                const user =data1.dataValues
                 res.status(200).send({
                   status: true,
                   message: 'Token sent to mail',
-                  data: respayload,
+                  // data: {
+                  //   ...data1,
+                  //   companyProfileId: companyData.id,
+                  // },                 
+                  data:{...user, companyProfileId: companyData}
                 });
               })
               .catch((error) => {
@@ -289,10 +305,10 @@ const login = catchAsync(async (req, res) => {
           userId: user.id,
           userType: user.userType,
         };
-        const tokens = await tokenService.generateAuthTokens(user.id)
+        const tokens = await tokenService.generateAuthTokens(user.id);
         res.status(200).send({
           status: true,
-          data: {user, tokens},
+          data: { user, tokens },
           // accessToken: token,
           message: 'successfully logged in',
         });
@@ -341,9 +357,11 @@ const login = catchAsync(async (req, res) => {
           delete agentData.password;
           delete agentData.verifyToken;
 
+          const tokens = tokenService.generateAuthTokens(agentData.id);
+
           res.status(200).send({
             status: true,
-            data: agentData,
+            data: { agentData, tokens },
             // accessToken: token,
             message: 'successfully logged in',
           });
@@ -362,7 +380,7 @@ const login = catchAsync(async (req, res) => {
 
 const logout = catchAsync(async (req, res) => {
   await authService.logout(req.body.refreshToken);
-  res.status(httpStatus.OK).send("logged out successfully!");
+  res.status(httpStatus.OK).send('logged out successfully!');
 });
 
 const refreshTokens = catchAsync(async (req, res) => {
@@ -394,6 +412,8 @@ const verifyEmail = catchAsync(async (req, res) => {
             role: req.query.type,
           },
         });
+        console.log(req.query.type)
+        console.log(user)
         if (user.verifyToken !== req.body.verifyToken) {
           res.status(400).send({ status: false, message: 'Verify account error' });
         } else {
@@ -420,7 +440,7 @@ const verifyEmail = catchAsync(async (req, res) => {
       } catch (error) {
         res.status(400).send({
           status: false,
-          message: error?.message ?? 'Verify account error',
+          message: error.message || 'Verify account error',
         });
       }
       break;
@@ -459,7 +479,7 @@ const verifyEmail = catchAsync(async (req, res) => {
       } catch (error) {
         res.status(400).send({
           status: false,
-          message: error?.message ?? 'Verify account error',
+          message: error.message || 'Verify account error',
         });
       }
       break;

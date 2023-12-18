@@ -3,7 +3,7 @@ const { sequelize } = require('../config/config');
 const logger = require('../config/logger');
 const fs = require("fs");
 
-// const sequelizeInstance = new Sequelize(sequelize.url);
+const sequelizeInstance = new Sequelize(sequelize.url);
 const db = {};
 
 // const sequelizeInstance = new Sequelize(sequelize.database, sequelize.user, sequelize.password, {
@@ -17,7 +17,6 @@ const db = {};
 //   },
 // });
 
-const sequelizeInstance = new Sequelize(sequelize.url);
 
 sequelizeInstance
   .authenticate()
@@ -75,9 +74,6 @@ db.leads.belongsTo(db.policy);
 
 db.leads.hasMany(db.claims);
 db.claims.belongsTo(db.leads);
-
-db.users.hasOne(db.tokens);
-db.tokens.belongsTo(db.users);
 
 db.company.hasMany(db.policy);
 db.policy.belongsTo(db.company);

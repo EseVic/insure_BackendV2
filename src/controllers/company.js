@@ -32,7 +32,7 @@ exports.companyController = {
  },
 
 
- updatePolicy: () => {
+ updatePolicy: (req, res) => {
     let policyId = req.params.policyId
     const payload = req.body
     db.policy.update(payload, {
@@ -55,9 +55,9 @@ exports.companyController = {
       });
  },
 
-  deletePolicy: () => {
+  deletePolicy: (req, res) => {
     let policyId = req.params.policyId
-    db.policy.delete({
+    db.policy.destroy({
         where: {
           id: policyId,
         },
@@ -77,7 +77,7 @@ exports.companyController = {
       });
  },
 
- getCompanyPolicies: () => {
+ getCompanyPolicies: (req, res) => {
     let companyId = req.params.companyId
   
     db.policy.findAndCountAll({
@@ -100,14 +100,14 @@ exports.companyController = {
       });
  },
 
- getOneCompanyPolicy: () => {
+ getOneCompanyPolicy: (req, res) => {
    
     let policyId = req.params.policyId
 
   
     db.policy.findOne({
         where: {
-            companyProfileId: companyId,
+            // companyProfileId: companyId,
             id: policyId
           },
       })
@@ -115,7 +115,7 @@ exports.companyController = {
         res.status(200).send({
             data,
             status: true,
-            message: "Policy created successfully",
+            message: "Policy retrived successfully",
           });
     })
     .catch((err) => {
@@ -132,7 +132,7 @@ exports.companyController = {
       .findAndCountAll({
         include: [{
           model: db.company,
-          as: "company",
+          as: "companyProfile",
           where: {id: companyId}
       }]
       })
@@ -157,7 +157,7 @@ exports.companyController = {
       .findOne({
         include: [{
           model: db.company,
-          as: "company",
+          as: "companyProfile",
           where: {id: agentId}
       }]
       })
@@ -183,8 +183,8 @@ exports.companyController = {
   
       db.leads
         .findAndCountAll({
-            where: {companyId: companyId},
           include: [{
+            where: {companyProfileId: companyId},
             model: db.agent,
             as: "agent",   
         },{

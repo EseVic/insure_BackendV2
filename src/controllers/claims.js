@@ -4,11 +4,6 @@ const { db } = require("../models");
 require("dotenv").config();
 // const { emailService } = require('../services');
 
-// const axios = require("axios");
-// const generator = require("generate-password");
-// const { email } = require("../config/config");
-
-
 
 exports.claimsController = {
 
@@ -21,18 +16,18 @@ exports.claimsController = {
       res.status(200).send({
           data,
           status: true,
-          message: "Claim created successfully",
+          message: "Claim created successfully!",
         });
   })
   .catch((err) => {
     res.status(400).send({
-      message: err.message || "Could not find record",
+      message: err.message || "Could not find record!",
       status: false
     });
   });
 },
 
- getAllClaimss: (req, res) => {
+ getAllClaims: (req, res) => {
   let agentId = req.params.agentId
 
     db.claims
@@ -49,12 +44,12 @@ exports.claimsController = {
         res.status(200).send({
           data,
           status: true,
-          message: "all claims retrieved successfully",
+          message: "all claims retrieved successfully!",
         });
       })
       .catch((err) => {
         res.status(400).send({
-          message: err.message || "Could not find record",
+          message: err.message || "Could not find record!",
           status: false
         });
       });
@@ -77,18 +72,18 @@ exports.claimsController = {
         res.status(200).send({
           data,
           status: true,
-          message: "claim retrieved successfully",
+          message: "claim retrieved successfully!",
         });
       })
       .catch((err) => {
         res.status(400).send({
-          message: err.message || "Could not find record",
+          message: err.message || "Could not find record!",
           status: false
         });
       });
   },
 
-  updateClaim: () => {
+  updateClaim: (req, res) => {
     let claimId = req.params.claimId
 
     const payload = req.body
@@ -101,12 +96,12 @@ exports.claimsController = {
         res.status(200).send({
             data,
             status: true,
-            message: "claim updated successfully",
+            message: "claim updated successfully!",
           });
     })
     .catch((err) => {
       res.status(400).send({
-        message: err.message || "Could not find record",
+        message: err.message || "Could not find record!",
         status: false
       });
     });

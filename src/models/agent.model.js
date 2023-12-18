@@ -39,18 +39,18 @@ module.exports = (sequelize, dataType) => {
     },
   });
 
-  agent.associate = (models) => {
-    agent.belongsTo(models.User, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
-    });
-    agent.associate = (companyProfile) => {
-      agent.belongsTo(model.companyProfile, {
-        foreignKey: 'companyProfileId',
-        onDelete: 'CASCADE',
-      });
-    };
-  };
+  // agent.associate = (models) => {
+  //   agent.belongsTo(models.User, {
+  //     foreignKey: 'userId',
+  //     onDelete: 'CASCADE',
+  //   });
+  //   agent.associate = (model) => {
+  //     agent.belongsTo(model.companyProfile, {
+  //       foreignKey: 'companyProfileId',
+  //       onDelete: 'CASCADE',
+  //     });
+  //   };
+  // };
 
   return agent;
 };

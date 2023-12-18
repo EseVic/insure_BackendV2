@@ -66,8 +66,7 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     if (!user) {
       throw new Error();
     }
-    const hashPassword = await bcrypt.hash(newPassword, 10)
-    await userService.updateUserById(user.id, { password: hashPassword});
+    await userService.updateUserById(user.id, { password: newPassword });
     await db.tokens.destroy({ where: { user: user.id, type: tokenTypes.RESET_PASSWORD } });
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');

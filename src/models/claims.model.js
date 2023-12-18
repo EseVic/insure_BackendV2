@@ -11,13 +11,12 @@ module.exports = (sequelize, dataType) => {
     paymentStatus: {
       type: dataType.STRING,
       allowNull: false,
-      type: dataType.ENUM('not paid', 'in progress', 'paid'),
     },
     claimsDescription: {
       type: dataType.STRING,
       allowNull: false,
     },
-    notificationDate: {
+    submittedDate: {
       type: dataType.DATE,
       allowNull: false,
     },

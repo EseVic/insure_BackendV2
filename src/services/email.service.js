@@ -43,7 +43,7 @@ const sendEmail = async (to, subject, text) => {
   const msg = { from: process.env.EMAIL_FROM, to, subject, text};
   // console.log(msg)
  const trans =  await transport.sendMail(msg);
-//  console.log(trans)
+ console.log(trans)
 };
 
 /**
@@ -54,8 +54,7 @@ const sendEmail = async (to, subject, text) => {
  */
 const sendResetPasswordEmail = async (to, token) => {
   const subject = 'Reset password';
-  // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
+  const resetPasswordUrl =`https://insure-personal-git-alice-home-alice2212.vercel.app/Auth/resetpassword?token=${token}`;
   const text = `Dear user,
 To reset your password, click on this link: ${resetPasswordUrl}
 If you did not request any password resets, then ignore this email.`;
@@ -64,8 +63,7 @@ If you did not request any password resets, then ignore this email.`;
 
 const sendAgentRegistrationEmail = async (to, companyName) => {
   const subject = 'Agent Onboarding';
-  // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app`;
+  const resetPasswordUrl = `https://insure-personal-git-alice-home-alice2212.vercel.app/auth/agent/registration`;
   const text = `Dear user,
 @ ${companyName} has requested to you to be an agent,  click on this link: ${resetPasswordUrl} 
 to accept the request and make sure you use your registered email ${to}`;
@@ -80,8 +78,7 @@ to accept the request and make sure you use your registered email ${to}`;
  */
 const sendVerificationEmail = async (to, token) => {
   const subject = 'Email Verification';
-  // replace this url with the link to the email verification page of your front-end app
-  const verificationEmailUrl = `http://link-to-app/verify-email?token=${token}`;
+  const verificationEmailUrl = `https://insure-personal-git-alice-home-alice2212.vercel.app/auth/otp/verify-email?token=${token}`;
   const text = `Dear user,
 To verify your email, click on this link: ${verificationEmailUrl}
 If you did not create an account, then ignore this email.`;

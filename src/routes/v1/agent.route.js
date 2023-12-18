@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post('/lead/:agentId', agentController.createLeads);
 router.get('/alleads/:agentId', agentController.getAllAgentLeads);
-router.get('/singlelead//:leadId', agentController.getSingleAgentLead);
+router.get('/singlelead/:leadId', agentController.getSingleAgentLead);
 router.put('/updatelead/:leadId', agentController.updateLead);
 
 

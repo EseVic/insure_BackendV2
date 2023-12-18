@@ -20,11 +20,6 @@ const defaultRoutes = [
     path: '/company',
     route: companyRoute,
   },
-
-  {
-    path: '/agent',
-    route: agentRoute,
-  },
   {
     path: '/agent',
     route: agentRoute,

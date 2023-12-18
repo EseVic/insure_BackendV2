@@ -21,12 +21,12 @@ exports.agentController = {
       res.status(200).send({
           data,
           status: true,
-          message: "Leads created successfully",
+          message: "Leads created successfully!",
         });
   })
   .catch((err) => {
     res.status(400).send({
-      message: err.message || "Could not find record",
+      message: err.message || "Could not find record!",
       status: false
     });
   });
@@ -48,12 +48,12 @@ exports.agentController = {
         res.status(200).send({
           data,
           status: true,
-          message: "all agents leads retrieved successfully",
+          message: "all agents leads retrieved successfully!",
         });
       })
       .catch((err) => {
         res.status(400).send({
-          message: err.message || "Could not find record",
+          message: err.message || "Could not find record!",
           status: false
         });
       });
@@ -63,31 +63,36 @@ exports.agentController = {
     // let agentId = req.params.agentId
     let leadId = req.params.leadId
 
-    db.agent
+    db.leads
       .findOne({
-        where: {leadId: leadId},
+        where: {id: leadId},
         include: [{
           model: db.policy,
           as: "policy",   
-      }],
+      },
+      {
+        model: db.agent,
+        as: "agent",   
+    }
+    ],
 
       })
       .then((data) => {
         res.status(200).send({
           data,
           status: true,
-          message: "agent lead retrieved successfully",
+          message: "agent lead retrieved successfully!",
         });
       })
       .catch((err) => {
         res.status(400).send({
-          message: err.message || "Could not find record",
+          message: err.message || "Could not find record!",
           status: false
         });
       });
   },
 
-  updateLead: () => {
+  updateLead: (req, res) => {
     let leadId = req.params.leadId
     const payload = req.body
     db.policy.update(payload, {
@@ -99,12 +104,12 @@ exports.agentController = {
         res.status(200).send({
             data,
             status: true,
-            message: "Lead updated successfully",
+            message: "Lead updated successfully!",
           });
     })
     .catch((err) => {
       res.status(400).send({
-        message: err.message || "Could not find record",
+        message: err.message || "Could not find record!",
         status: false
       });
     });

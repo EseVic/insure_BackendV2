@@ -8,7 +8,7 @@ const { dashController } = require('../../controllers/dashboard');
 
 const router = express.Router();
 
-router.get('/company/:comapnyId', dashController.companyDash);
+router.get('/company/:companyId', dashController.companyDash);
 router.get('/agent/:agentId', dashController.agentDash);
 
 
@@ -22,17 +22,17 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   name: Agent
- *   description: Agents management and retrieval
+ *   name: Dash
+ *   description: Dashbaord management
  */
 
 /**
  * @swagger
- * /auth/Register?type=agent:
+ * /auth/?type=dash:
  *   post:
- *     summary: Create an agent
- *     description: Only admins can create other users (Agents).
- *     tags: [Agent]
+ *     summary: Create a dashboard
+ *     description: Only admin and agents can create other users.
+ *     tags: [Dashboard]
  *     
  *     requestBody:
  *       required: true

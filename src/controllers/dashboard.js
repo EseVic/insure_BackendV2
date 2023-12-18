@@ -7,16 +7,17 @@ companyDash: async (req, res) => {
     try {
         let companyId = req.params.companyId
       const agent = await db.agent.findAndCountAll({
+        where: { companyProfileId: companyId },
         include: [
           {
-            model: db.users, as: "users",
-            where: { companyProfileId: companyId },
+            model: db.users, as: "user",
+           
           },
         ],
       });
       let leads = []
       agent.rows.forEach( async (single) => {
-        const lead  = await db.leads.findAAll({ agentId: single.Id });
+        const lead  = await db.leads.findAll({ agentId: single.Id });
         leads.push(...lead)
       });
       
