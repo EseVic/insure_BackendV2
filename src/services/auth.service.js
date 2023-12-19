@@ -62,10 +62,12 @@ const refreshAuth = async (refreshToken) => {
 const resetPassword = async (resetPasswordToken, newPassword) => {
   try {
     const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
+    console.log(resetPasswordTokenDoc)
     const user = await userService.getUserById(resetPasswordTokenDoc.user);
     if (!user) {
       throw new Error();
     }
+    console.log(user)
     await userService.updateUserById(user.id, { password: newPassword });
     await db.tokens.destroy({ where: { user: user.id, type: tokenTypes.RESET_PASSWORD } });
   } catch (error) {

@@ -169,8 +169,9 @@ const register = catchAsync(async (req, res) => {
               }
             );
             // console.log(data.id)
+              agentData.password = bcrypt.hashSync(agentData.password, 10);
             await db.users.update(
-              { phoneNumber: agentData.phoneNumber },
+              { phoneNumber: agentData.phoneNumber, password: agentData.password },
               {
                 where: {
                   id: data.id,
@@ -220,7 +221,7 @@ const register = catchAsync(async (req, res) => {
                   subject: 'Signup as an agent on INsure',
                   text: `Dear agent,
               ${companyData.companyName} just invited you to INsure! Please visit this https://insure-personal-git-alice-home-alice2212.vercel.app/auth/agent/registration to setup your account. 
-                    Your verification pin is ${verifyToken}`,
+                Your verification pin is ${verifyToken}.`
                 };
                 await emailService.sendEmail(emailData.to, emailData.subject, emailData.text);
                 delete data1.password;
@@ -324,10 +325,11 @@ const login = catchAsync(async (req, res) => {
       await db.users
         .findOne({
           where: { email: req.body.email },
-          include: [{ model: db.company, as: 'agent' }],
+          include: [{ model: db.agent, as: 'agent' }],
         })
         .then((agentData) => {
           // if record doesn't exist
+          console.log(agentData)
           if (!agentData) {
             return res.status(404).send({
               message: 'Invalid username or password',
@@ -341,7 +343,7 @@ const login = catchAsync(async (req, res) => {
           }
           // compare the request password with the hashed password saved in the database
           let passwordIsValid = bcrypt.compareSync(req.body.password, agentData.password);
-
+          console.log(passwordIsValid)
           // if password is not valid
           if (!passwordIsValid) {
             return res.status(404).send({
@@ -369,7 +371,7 @@ const login = catchAsync(async (req, res) => {
         .catch((err) => {
           res.status(400).send({
             status: false,
-            message: 'Could not fetch record',
+            message: 'Could not fetch record' + err,
           });
         });
       break;
@@ -391,12 +393,20 @@ const refreshTokens = catchAsync(async (req, res) => {
 const forgotPassword = catchAsync(async (req, res) => {
   const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.NO_CONTENT).send();
+  // res.status(httpStatus.NO_CONTENT).send();
+
+  const role = req.query.type || 'unknown'; // Adjust 'unknown' as needed
+  console.log(role)
+  res.status(httpStatus.NO_CONTENT).json({ status: 'success', role });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
   await authService.resetPassword(req.query.token, req.body.password);
-  res.status(httpStatus.NO_CONTENT).send();
+  // res.status(httpStatus.NO_CONTENT).send();
+
+  // const role = req.query.type || 'unknown'; // Adjust 'unknown' as needed
+  // console.log(role)
+  // res.status(httpStatus.NO_CONTENT).json({ status: 'success', role });
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
